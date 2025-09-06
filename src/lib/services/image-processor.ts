@@ -47,6 +47,9 @@ export class ImageProcessor {
     //   processed = await this.applyFinalSize(processed, style.finalSize);
     // }
 
+    // Trim transparent pixels to remove any unwanted transparency
+    processed = processed.trim();
+
     return processed.png().toBuffer();
   }
 
@@ -102,7 +105,8 @@ export class ImageProcessor {
       {
         input: await image.toBuffer(),
         left: margin,
-        top: margin
+        top: margin,
+        blend: 'over'
       }
     ]);
   }
@@ -115,7 +119,7 @@ export class ImageProcessor {
         channels: 4,
         background: color
       }
-    }).png().toBuffer();
+    }).flatten({ background: color }).png().toBuffer();
   }
 
   private static async createGradientBackground(
@@ -139,7 +143,10 @@ export class ImageProcessor {
       </svg>
     `;
 
-    return Buffer.from(svg);
+    // Convert SVG to PNG buffer ensuring no transparency around edges
+    return sharp(Buffer.from(svg))
+      .png()
+      .toBuffer();
   }
 
   private static async applyShadow(
@@ -187,7 +194,8 @@ export class ImageProcessor {
       {
         input: await image.toBuffer(),
         left: baseX,
-        top: baseY
+        top: baseY,
+        blend: 'over'
       }
     ]);
   }
