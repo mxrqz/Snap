@@ -1,8 +1,1 @@
-{
-  "/page": "app/page.js",
-  "/api/health/route": "app/api/health/route.js",
-  "/docs/page": "app/docs/page.js",
-  "/api/snap/route": "app/api/snap/route.js",
-  "/api/preview/route": "app/api/preview/route.js",
-  "/api/route": "app/api/route.js"
-}
+{}
