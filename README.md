@@ -2,10 +2,10 @@
 
 > Beautiful styled screenshots API powered by Microlink - Create ray.so-style images for websites
 
-[![API Status](https://img.shields.io/badge/status-active-brightgreen)](http://localhost:3000/health)
+[![API Status](https://img.shields.io/badge/status-active-brightgreen)](http://localhost:3000/api/health)
 [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![Bun](https://img.shields.io/badge/Bun-000000?logo=bun&logoColor=white)](https://bun.sh/)
-[![OpenAPI](https://img.shields.io/badge/OpenAPI-3.0-brightgreen)](http://localhost:3000/docs)
+[![Next.js](https://img.shields.io/badge/Next.js-black?logo=next.js&logoColor=white)](https://nextjs.org/)
+[![OpenAPI](https://img.shields.io/badge/OpenAPI-3.0-brightgreen)](http://localhost:3000/api/docs)
 
 Transform any website into a beautiful, styled screenshot with custom gradients, shadows, browser mockups, and more. Perfect for social media, presentations, and portfolios.
 
@@ -46,7 +46,7 @@ The API will be available at `http://localhost:3000`
 
 ### Interactive API Documentation
 
-Visit `http://localhost:3000/docs` for complete interactive Swagger UI documentation with:
+Visit `http://localhost:3000/api/docs` for complete interactive Swagger UI documentation with:
 
 - 📝 Detailed endpoint descriptions
 - 🧪 Try-it-out functionality
@@ -57,11 +57,12 @@ Visit `http://localhost:3000/docs` for complete interactive Swagger UI documenta
 
 | Endpoint | Method | Description |
 |----------|---------|-------------|
-| `/` | GET | API information and endpoints |
-| `/health` | GET | Health check |
-| `/snap` | GET/POST | Generate styled screenshot |
-| `/preview` | GET | Browser preview with download |
-| `/docs` | GET | Swagger UI documentation |
+| `/` | GET | Next.js home page |
+| `/api` | GET | API information and endpoints |
+| `/api/health` | GET | Health check |
+| `/api/snap` | GET/POST | Generate styled screenshot |
+| `/api/preview` | GET | Browser preview with download |
+| `/api/docs` | GET | Swagger UI documentation |
 | `/openapi.json` | GET | OpenAPI specification |
 
 ## 🎯 Usage Examples
@@ -69,19 +70,19 @@ Visit `http://localhost:3000/docs` for complete interactive Swagger UI documenta
 ### 1. Simple Screenshot (GET)
 
 ```bash
-curl "http://localhost:3000/snap?url=https://example.com"
+curl "http://localhost:3000/api/snap?url=https://example.com"
 ```
 
 ### 2. Styled Screenshot (GET)
 
 ```bash
-curl "http://localhost:3000/snap?url=https://github.com&borderRadius=15&margin=40&browserMockup=safari"
+curl "http://localhost:3000/api/snap?url=https://github.com&borderRadius=15&margin=40&browserMockup=safari"
 ```
 
 ### 3. Advanced Configuration (POST)
 
 ```bash
-curl -X POST "http://localhost:3000/snap" \
+curl -X POST "http://localhost:3000/api/snap" \
   -H "Content-Type: application/json" \
   -d '{
     "url": "https://tailwindcss.com",
@@ -120,7 +121,7 @@ curl -X POST "http://localhost:3000/snap" \
 
 ```bash
 # Open in browser
-open "http://localhost:3000/preview?url=https://example.com&borderRadius=15&margin=40"
+open "http://localhost:3000/api/preview?url=https://example.com&borderRadius=15&margin=40"
 ```
 
 ### 5. Save to File (CLI)
@@ -345,4 +346,4 @@ MIT License - see LICENSE file for details.
 
 **Ready to create beautiful screenshots?** 🚀
 
-Start the server with `bun run dev` and visit `http://localhost:3000/docs` for interactive documentation!
+Start the server with `bun run dev` and visit `http://localhost:3000/api/docs` for interactive documentation!

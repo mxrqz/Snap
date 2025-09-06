@@ -1,5 +1,5 @@
 import { test, expect } from "bun:test";
-import { MicrolinkService } from "../services/microlink.js";
+import { MicrolinkService } from "../src/lib/services/microlink";
 
 test("should generate correct Microlink API URL", () => {
   const config = {

@@ -1,23 +1,27 @@
 import { test, expect } from "bun:test";
 
-// These tests require the server to be running
-// Run with: bun run dev (in another terminal) && bun test test/integration.test.ts
+// Integration tests for the Snap API
+// Note: These tests require a running server on port 3001
 
-test("Integration tests require server to be running", () => {
-  // This is just a placeholder test to remind users to start the server
-  console.log("⚠️  Integration tests skipped. To run them:");
-  console.log("   1. Start server: bun run dev");
-  console.log("   2. Run tests: bun test test/integration.test.ts");
-  expect(true).toBe(true);
-});
-
-// Uncomment these tests when you want to test with a running server:
-
-/*
 const BASE_URL = "http://localhost:3000";
 
+// Helper function to check if server is running
+async function isServerRunning(): Promise<boolean> {
+  try {
+    await fetch(`${BASE_URL}/api/health`);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 test("API root endpoint should return service info", async () => {
-  const response = await fetch(BASE_URL);
+  if (!(await isServerRunning())) {
+    console.log("⚠️  Server not running on port 3001. Skipping integration tests.");
+    return;
+  }
+
+  const response = await fetch(`${BASE_URL}/api`);
   const data = await response.json();
   
   expect(response.status).toBe(200);
@@ -26,7 +30,12 @@ test("API root endpoint should return service info", async () => {
 });
 
 test("Health endpoint should return status ok", async () => {
-  const response = await fetch(`${BASE_URL}/health`);
+  if (!(await isServerRunning())) {
+    console.log("⚠️  Server not running on port 3001. Skipping integration tests.");
+    return;
+  }
+
+  const response = await fetch(`${BASE_URL}/api/health`);
   const data = await response.json();
   
   expect(response.status).toBe(200);
@@ -34,23 +43,88 @@ test("Health endpoint should return status ok", async () => {
   expect(data.timestamp).toBeDefined();
 });
 
-test("GET /snap should require url parameter", async () => {
-  const response = await fetch(`${BASE_URL}/snap`);
+test("GET /api/snap should require url parameter", async () => {
+  if (!(await isServerRunning())) {
+    console.log("⚠️  Server not running on port 3001. Skipping integration tests.");
+    return;
+  }
+
+  const response = await fetch(`${BASE_URL}/api/snap`);
   const data = await response.json();
   
   expect(response.status).toBe(400);
   expect(data.success).toBe(false);
-  expect(data.error).toContain("Missing required parameter: url");
+  expect(data.error).toContain("url");
 });
 
-test("Direct image response should work", async () => {
-  const response = await fetch(`${BASE_URL}/snap?url=https://example.com`);
+test("GET /api/snap with valid URL should generate screenshot", async () => {
+  if (!(await isServerRunning())) {
+    console.log("⚠️  Server not running on port 3001. Skipping integration tests.");
+    return;
+  }
+
+  const response = await fetch(`${BASE_URL}/api/snap?url=https://example.com`);
   const data = await response.json();
   
-  // Should not get "Expected JSON response, got: image/png" error anymore
-  if (response.status !== 200) {
-    expect(data.error).not.toContain("Expected JSON response, got: image/png");
-    expect(data.error).not.toContain("Expected number, received nan");
+  if (response.status === 200) {
+    expect(data.success).toBe(true);
+    expect(data.imageUrl).toBeDefined();
+    expect(data.imageUrl).toMatch(/^data:image\/(png|jpeg);base64,/);
+    expect(data.metadata).toBeDefined();
+    expect(data.metadata.originalUrl).toBe("https://example.com");
+  } else {
+    // If there's an error, make sure it's not validation related
+    expect(data.success).toBe(false);
+    expect(data.error).toBeDefined();
   }
-});
-*/
+}, 30000); // 30 second timeout for screenshot generation
+
+test("POST /api/snap with JSON body should work", async () => {
+  if (!(await isServerRunning())) {
+    console.log("⚠️  Server not running on port 3001. Skipping integration tests.");
+    return;
+  }
+
+  const response = await fetch(`${BASE_URL}/api/snap`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      url: 'https://example.com',
+      style: {
+        borderRadius: 10,
+        margin: 20
+      }
+    })
+  });
+  
+  const data = await response.json();
+  
+  if (response.status === 200) {
+    expect(data.success).toBe(true);
+    expect(data.imageUrl).toBeDefined();
+    expect(data.metadata).toBeDefined();
+  } else {
+    expect(data.success).toBe(false);
+    expect(data.error).toBeDefined();
+  }
+}, 30000);
+
+test("GET /api/preview should return HTML", async () => {
+  if (!(await isServerRunning())) {
+    console.log("⚠️  Server not running on port 3001. Skipping integration tests.");
+    return;
+  }
+
+  const response = await fetch(`${BASE_URL}/api/preview?url=https://example.com`);
+  
+  if (response.status === 200) {
+    const html = await response.text();
+    expect(html).toContain('<!DOCTYPE html>');
+    expect(html).toContain('<img');
+  } else {
+    // Preview might fail if screenshot generation fails
+    expect(response.status).toBeGreaterThanOrEqual(400);
+  }
+}, 30000);

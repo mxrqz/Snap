@@ -1,5 +1,5 @@
 import { test, expect } from "bun:test";
-import { validateSnapQuery } from "../validation.js";
+import { validateSnapQuery } from "../src/lib/validation";
 
 test("should handle empty string parameters without throwing", () => {
   const queryWithEmptyValues = {

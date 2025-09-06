@@ -20,29 +20,29 @@ Server starts at: `http://localhost:3000`
 
 **Option A: Browser Preview (Easiest)**
 ```
-http://localhost:3000/preview?url=https://example.com
+http://localhost:3000/api/preview?url=https://example.com
 ```
 
 **Option B: API Call**
 ```bash
-curl "http://localhost:3000/snap?url=https://example.com"
+curl "http://localhost:3000/api/snap?url=https://example.com"
 ```
 
 ### 3. Explore Documentation
 ```
-http://localhost:3000/docs
+http://localhost:3000/api/docs
 ```
 
 ## 🎯 Common Use Cases
 
 ### Social Media Screenshots
 ```bash
-curl "http://localhost:3000/snap?url=https://github.com/your-repo&borderRadius=15&margin=40&browserMockup=safari"
+curl "http://localhost:3000/api/snap?url=https://github.com/your-repo&borderRadius=15&margin=40&browserMockup=safari"
 ```
 
 ### Portfolio Showcase
 ```bash
-curl -X POST "http://localhost:3000/snap" \
+curl -X POST "http://localhost:3000/api/snap" \
   -H "Content-Type: application/json" \
   -d '{
     "url": "https://your-website.com",
@@ -71,7 +71,7 @@ curl -X POST "http://localhost:3000/snap" \
 ### Presentation Screenshots
 ```bash
 # Clean, professional look
-curl "http://localhost:3000/snap?url=https://docs.site.com&background.type=solid&background.color=%23ffffff&borderRadius=8&margin=50&browserMockup=chrome"
+curl "http://localhost:3000/api/snap?url=https://docs.site.com&background.type=solid&background.color=%23ffffff&borderRadius=8&margin=50&browserMockup=chrome"
 ```
 
 ## 🔧 Quick CLI Tool
@@ -96,17 +96,17 @@ Files saved to: `./screenshots/`
 
 ### Mobile Screenshot
 ```bash
-curl "http://localhost:3000/snap?url=https://example.com&viewport.width=375&viewport.height=667&viewport.isMobile=true"
+curl "http://localhost:3000/api/snap?url=https://example.com&viewport.width=375&viewport.height=667&viewport.isMobile=true"
 ```
 
 ### Tablet Screenshot
 ```bash
-curl "http://localhost:3000/snap?url=https://example.com&viewport.width=768&viewport.height=1024"
+curl "http://localhost:3000/api/snap?url=https://example.com&viewport.width=768&viewport.height=1024"
 ```
 
 ### Desktop Screenshot
 ```bash
-curl "http://localhost:3000/snap?url=https://example.com&viewport.width=1920&viewport.height=1080"
+curl "http://localhost:3000/api/snap?url=https://example.com&viewport.width=1920&viewport.height=1080"
 ```
 
 ## 🎨 Styling Presets
@@ -160,7 +160,7 @@ curl "http://localhost:3000/snap?url=https://example.com&viewport.width=1920&vie
 
 ### Check API Health
 ```bash
-curl http://localhost:3000/health
+curl http://localhost:3000/api/health
 ```
 
 ### Validate Your URLs
@@ -173,17 +173,17 @@ Make sure your URLs are fully qualified:
 **Empty Parameters**: Use empty string instead of undefined
 ```bash
 # ❌ This might cause NaN errors
-curl "http://localhost:3000/snap?url=https://example.com&margin="
+curl "http://localhost:3000/api/snap?url=https://example.com&margin="
 
 # ✅ Better to omit completely
-curl "http://localhost:3000/snap?url=https://example.com"
+curl "http://localhost:3000/api/snap?url=https://example.com"
 ```
 
 **Rate Limiting**: If you get 503 errors, wait a moment and try again (Microlink API limits)
 
 ## 📚 Next Steps
 
-1. **Explore Full Documentation**: Visit `http://localhost:3000/docs`
+1. **Explore Full Documentation**: Visit `http://localhost:3000/api/docs`
 2. **Try Different Styling Options**: Check the main README
 3. **Integrate with Your App**: Use the API endpoints in your projects
 4. **Save Images Locally**: Use the CLI tool for batch processing
@@ -191,7 +191,7 @@ curl "http://localhost:3000/snap?url=https://example.com"
 ## 🤝 Need Help?
 
 - 📖 **Full Documentation**: Check `README.md`
-- 🔧 **API Reference**: Visit `http://localhost:3000/docs` 
+- 🔧 **API Reference**: Visit `http://localhost:3000/api/docs` 
 - 🧪 **Examples**: Run `bun demo.ts`
 - ❓ **Issues**: Create an issue in the repository
 

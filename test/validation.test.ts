@@ -1,5 +1,5 @@
 import { test, expect } from "bun:test";
-import { validateSnapRequest, validateSnapQuery, queryToRequest } from "../validation.js";
+import { validateSnapRequest, validateSnapQuery, queryToRequest } from "../src/lib/validation";
 
 test("should validate a basic snap request", () => {
   const validRequest = {
