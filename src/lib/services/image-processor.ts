@@ -37,10 +37,6 @@ export class ImageProcessor {
       );
     }
 
-    if (style.shadow.enabled) {
-      processed = await this.applyShadow(processed, style.shadow);
-    }
-
     // Apply final size as the very last step to avoid dimension conflicts
     // TODO: Temporarily disabled due to compositing issues
     // if (style.finalSize) {
@@ -260,12 +256,12 @@ export class ImageProcessor {
       },
       browserMockup: 'none',
       shadow: {
-        enabled: true,
-        blur: 20,
+        enabled: false,
+        blur: 8,
         offsetX: 0,
-        offsetY: 10,
+        offsetY: 4,
         color: '#000000',
-        opacity: 0.15
+        opacity: 0.08
       }
     };
   }

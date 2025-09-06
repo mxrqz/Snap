@@ -189,7 +189,7 @@ export function queryToRequest(query: ValidatedSnapQuery): ValidatedSnapRequest 
 
   // Handle finalSize parameters
   if (query['finalSize.width'] || query['finalSize.height'] || query['finalSize.aspectRatio'] || query['finalSize.maintainAspectRatio'] !== undefined) {
-    request.style!.finalSize = {};
+    request.style!.finalSize = { maintainAspectRatio: true };
     if (query['finalSize.width']) request.style!.finalSize.width = query['finalSize.width'];
     if (query['finalSize.height']) request.style!.finalSize.height = query['finalSize.height'];
     if (query['finalSize.aspectRatio']) request.style!.finalSize.aspectRatio = query['finalSize.aspectRatio'];

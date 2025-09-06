@@ -5,6 +5,8 @@ import { BrowserMockupService } from '@/lib/services/browser-mockup'
 import { validateSnapQuery, queryToRequest } from '@/lib/validation'
 import type { ScreenshotConfig, StyleConfig } from '@/lib/types'
 
+export const dynamic = 'force-dynamic'
+
 async function processSnapshot(url: string, screenshotConfig?: Partial<ScreenshotConfig>, styleConfig?: Partial<StyleConfig>): Promise<{ buffer: Buffer, metadata: any }> {
   const finalScreenshotConfig: ScreenshotConfig = {
     ...MicrolinkService.getDefaultConfig(),

@@ -72,7 +72,7 @@ async function saveImage(options: SaveImageOptions): Promise<string> {
 }
 
 // CLI Usage
-if (import.meta.main) {
+async function main() {
   const args = process.argv.slice(2);
   
   if (args.length === 0 || args.includes('--help') || args.includes('-h')) {
@@ -131,6 +131,10 @@ Examples:
   } catch (error) {
     process.exit(1);
   }
+}
+
+if (require.main === module) {
+  main().catch(() => process.exit(1));
 }
 
 export { saveImage, type SaveImageOptions };

@@ -5,6 +5,8 @@ import { BrowserMockupService } from '@/lib/services/browser-mockup'
 import { validateSnapRequest, validateSnapQuery, queryToRequest } from '@/lib/validation'
 import type { SnapResponse, ScreenshotConfig, StyleConfig } from '@/lib/types'
 
+export const dynamic = 'force-dynamic'
+
 function createErrorResponse(error: string, status = 400): NextResponse {
   const response: SnapResponse = {
     success: false,
