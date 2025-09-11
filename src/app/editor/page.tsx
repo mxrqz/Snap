@@ -49,10 +49,19 @@ interface StyleConfig {
   borderRadius: number;
   margin: number;
   background: {
-    type: 'solid' | 'gradient';
+    type: 'solid' | 'gradient' | 'pattern';
     color?: string;
     direction?: 'to-r' | 'to-l' | 'to-t' | 'to-b' | 'to-br' | 'to-bl' | 'to-tr' | 'to-tl';
     colors?: Array<{ color: string; position?: number }>;
+    // Pattern properties
+    pattern?: 'dots' | 'lines' | 'grid';
+    patternSize?: number;
+    patternColor?: string;
+    patternOpacity?: number;
+    patternBackgroundType?: 'solid' | 'gradient'; // Background base for patterns
+    // Texture properties
+    texture?: 'noise' | 'paper' | 'fabric' | 'none';
+    textureIntensity?: number;
   };
   browserMockup: 'safari' | 'chrome' | 'firefox' | 'edge' | 'none';
   shadow: {
@@ -98,7 +107,14 @@ const DEFAULT_STYLE: StyleConfig = {
     colors: [
       { color: '#667eea', position: 0 },
       { color: '#764ba2', position: 100 }
-    ]
+    ],
+    texture: 'none',
+    textureIntensity: 0.5,
+    pattern: 'dots',
+    patternSize: 20,
+    patternColor: '#ffffff',
+    patternOpacity: 0.1,
+    patternBackgroundType: 'solid'
   },
   browserMockup: 'none',
   shadow: {
@@ -498,19 +514,32 @@ export default function EditorPage() {
                       <Label className="text-sm">Background Type</Label>
                       <Select
                         value={state.style.background.type}
-                        onValueChange={(value: 'solid' | 'gradient') => setState(prev => ({
+                        onValueChange={(value: 'solid' | 'gradient' | 'pattern') => setState(prev => ({
                           ...prev,
                           style: { 
                             ...prev.style, 
                             background: { 
                               type: value,
-                              ...(value === 'solid' ? { color: '#667eea' } : {
-                                direction: 'to-br' as const,
-                                colors: [
-                                  { color: '#667eea', position: 0 },
-                                  { color: '#764ba2', position: 100 }
-                                ]
-                              })
+                              ...(value === 'solid' ? { color: '#667eea' } : 
+                                value === 'gradient' ? {
+                                  direction: 'to-br' as const,
+                                  colors: [
+                                    { color: '#667eea', position: 0 },
+                                    { color: '#764ba2', position: 100 }
+                                  ]
+                                } : {
+                                  pattern: 'dots' as const,
+                                  patternSize: 20,
+                                  patternColor: '#ffffff',
+                                  patternOpacity: 0.1,
+                                  patternBackgroundType: 'solid' as const,
+                                  color: '#667eea',
+                                  direction: 'to-br' as const,
+                                  colors: [
+                                    { color: '#667eea', position: 0 },
+                                    { color: '#764ba2', position: 100 }
+                                  ]
+                                })
                             } 
                           }
                         }))}
@@ -521,6 +550,7 @@ export default function EditorPage() {
                         <SelectContent className="bg-gray-900 border-gray-700">
                           <SelectItem value="solid">Solid Color</SelectItem>
                           <SelectItem value="gradient">Gradient</SelectItem>
+                          <SelectItem value="pattern">Pattern</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -590,6 +620,327 @@ export default function EditorPage() {
                         </Select>
                       </div>
                     )}
+
+                    {state.style.background.type === 'pattern' && (
+                      <div className="space-y-4">
+                        <div>
+                          <Label className="text-sm">Pattern Type</Label>
+                          <Select
+                            value={state.style.background.pattern || 'dots'}
+                            onValueChange={(value: 'dots' | 'lines' | 'grid') => setState(prev => ({
+                              ...prev,
+                              style: {
+                                ...prev.style,
+                                background: {
+                                  ...prev.style.background,
+                                  pattern: value
+                                }
+                              }
+                            }))}
+                          >
+                            <SelectTrigger className="mt-2 bg-gray-800/30 border-gray-700/50">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent className="bg-gray-900 border-gray-700">
+                              <SelectItem value="dots">Dots</SelectItem>
+                              <SelectItem value="lines">Lines</SelectItem>
+                              <SelectItem value="grid">Grid</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+
+                        <div>
+                          <Label className="text-sm">Background Base</Label>
+                          <Select
+                            value={state.style.background.patternBackgroundType || 'solid'}
+                            onValueChange={(value: 'solid' | 'gradient') => setState(prev => ({
+                              ...prev,
+                              style: {
+                                ...prev.style,
+                                background: {
+                                  ...prev.style.background,
+                                  patternBackgroundType: value
+                                }
+                              }
+                            }))}
+                          >
+                            <SelectTrigger className="mt-2 bg-gray-800/30 border-gray-700/50">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent className="bg-gray-900 border-gray-700">
+                              <SelectItem value="solid">Solid Color</SelectItem>
+                              <SelectItem value="gradient">Gradient</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+
+                        {state.style.background.patternBackgroundType === 'solid' ? (
+                          <div>
+                            <Label className="text-sm">Background Color</Label>
+                            <Input
+                              type="color"
+                              value={state.style.background.color || '#667eea'}
+                              onChange={(e) => setState(prev => ({
+                                ...prev,
+                                style: {
+                                  ...prev.style,
+                                  background: {
+                                    ...prev.style.background,
+                                    color: e.target.value
+                                  }
+                                }
+                              }))}
+                              className="mt-2 h-10 bg-gray-800/30 border-gray-700/50"
+                            />
+                          </div>
+                        ) : (
+                          <>
+                            <div>
+                              <Label className="text-sm">Gradient Direction</Label>
+                              <Select
+                                value={state.style.background.direction || 'to-br'}
+                                onValueChange={(value: any) => setState(prev => ({
+                                  ...prev,
+                                  style: {
+                                    ...prev.style,
+                                    background: {
+                                      ...prev.style.background,
+                                      direction: value
+                                    }
+                                  }
+                                }))}
+                              >
+                                <SelectTrigger className="mt-2 bg-gray-800/30 border-gray-700/50">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent className="bg-gray-900 border-gray-700">
+                                  <SelectItem value="to-r">Left to Right</SelectItem>
+                                  <SelectItem value="to-l">Right to Left</SelectItem>
+                                  <SelectItem value="to-t">Bottom to Top</SelectItem>
+                                  <SelectItem value="to-b">Top to Bottom</SelectItem>
+                                  <SelectItem value="to-br">Top Left to Bottom Right</SelectItem>
+                                  <SelectItem value="to-bl">Top Right to Bottom Left</SelectItem>
+                                  <SelectItem value="to-tr">Bottom Left to Top Right</SelectItem>
+                                  <SelectItem value="to-tl">Bottom Right to Top Left</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+
+                            <div className="space-y-3">
+                              <Label className="text-sm">Gradient Colors</Label>
+                              {(state.style.background.colors || []).map((color, index) => (
+                                <div key={index} className="flex items-center gap-2">
+                                  <Input
+                                    type="color"
+                                    value={color.color}
+                                    onChange={(e) => setState(prev => {
+                                      const newColors = [...(prev.style.background.colors || [])];
+                                      newColors[index] = { ...newColors[index], color: e.target.value };
+                                      return {
+                                        ...prev,
+                                        style: {
+                                          ...prev.style,
+                                          background: {
+                                            ...prev.style.background,
+                                            colors: newColors
+                                          }
+                                        }
+                                      };
+                                    })}
+                                    className="w-12 h-8 rounded border-gray-700"
+                                  />
+                                  <Slider
+                                    value={[color.position || 0]}
+                                    onValueChange={([value]) => setState(prev => {
+                                      const newColors = [...(prev.style.background.colors || [])];
+                                      newColors[index] = { ...newColors[index], position: value };
+                                      return {
+                                        ...prev,
+                                        style: {
+                                          ...prev.style,
+                                          background: {
+                                            ...prev.style.background,
+                                            colors: newColors
+                                          }
+                                        }
+                                      };
+                                    })}
+                                    min={0}
+                                    max={100}
+                                    step={5}
+                                    className="flex-1"
+                                  />
+                                  <span className="text-xs text-gray-400 w-10">{color.position || 0}%</span>
+                                  {(state.style.background.colors || []).length > 2 && (
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => setState(prev => ({
+                                        ...prev,
+                                        style: {
+                                          ...prev.style,
+                                          background: {
+                                            ...prev.style.background,
+                                            colors: (prev.style.background.colors || []).filter((_, i) => i !== index)
+                                          }
+                                        }
+                                      }))}
+                                      className="h-8 w-8 p-0"
+                                    >
+                                      ×
+                                    </Button>
+                                  )}
+                                </div>
+                              ))}
+                              
+                              {(state.style.background.colors || []).length < 5 && (
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => setState(prev => {
+                                    const currentColors = prev.style.background.colors || [];
+                                    const newPosition = currentColors.length > 0 ? 
+                                      Math.max(...currentColors.map(c => c.position || 0)) + 20 : 0;
+                                    return {
+                                      ...prev,
+                                      style: {
+                                        ...prev.style,
+                                        background: {
+                                          ...prev.style.background,
+                                          colors: [...currentColors, { color: '#ffffff', position: Math.min(newPosition, 100) }]
+                                        }
+                                      }
+                                    };
+                                  })}
+                                  className="w-full mt-2 bg-gray-800/30 border-gray-700/50"
+                                >
+                                  + Add Color
+                                </Button>
+                              )}
+                            </div>
+                          </>
+                        )}
+
+                        <div>
+                          <Label className="text-sm">Pattern Color</Label>
+                          <Input
+                            type="color"
+                            value={state.style.background.patternColor || '#ffffff'}
+                            onChange={(e) => setState(prev => ({
+                              ...prev,
+                              style: {
+                                ...prev.style,
+                                background: {
+                                  ...prev.style.background,
+                                  patternColor: e.target.value
+                                }
+                              }
+                            }))}
+                            className="mt-2 h-10 bg-gray-800/30 border-gray-700/50"
+                          />
+                        </div>
+
+                        <div>
+                          <Label className="text-sm">Pattern Size</Label>
+                          <Slider
+                            value={[state.style.background.patternSize || 20]}
+                            onValueChange={([value]) => setState(prev => ({
+                              ...prev,
+                              style: {
+                                ...prev.style,
+                                background: {
+                                  ...prev.style.background,
+                                  patternSize: value
+                                }
+                              }
+                            }))}
+                            min={5}
+                            max={100}
+                            step={5}
+                            className="mt-2"
+                          />
+                          <div className="text-xs text-gray-400 mt-1">{state.style.background.patternSize || 20}px</div>
+                        </div>
+
+                        <div>
+                          <Label className="text-sm">Pattern Opacity</Label>
+                          <Slider
+                            value={[state.style.background.patternOpacity || 0.1]}
+                            onValueChange={([value]) => setState(prev => ({
+                              ...prev,
+                              style: {
+                                ...prev.style,
+                                background: {
+                                  ...prev.style.background,
+                                  patternOpacity: value
+                                }
+                              }
+                            }))}
+                            min={0.05}
+                            max={1}
+                            step={0.05}
+                            className="mt-2"
+                          />
+                          <div className="text-xs text-gray-400 mt-1">{Math.round((state.style.background.patternOpacity || 0.1) * 100)}%</div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Texture Controls - Apply to any background type */}
+                    <div className="space-y-4 border-t border-gray-700/30 pt-4">
+                      <h4 className="text-sm font-medium text-gray-300">Texture Overlay</h4>
+                      
+                      <div>
+                        <Label className="text-sm">Texture Type</Label>
+                        <Select
+                          value={state.style.background.texture || 'none'}
+                          onValueChange={(value: 'noise' | 'paper' | 'fabric' | 'none') => setState(prev => ({
+                            ...prev,
+                            style: {
+                              ...prev.style,
+                              background: {
+                                ...prev.style.background,
+                                texture: value
+                              }
+                            }
+                          }))}
+                        >
+                          <SelectTrigger className="mt-2 bg-gray-800/30 border-gray-700/50">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent className="bg-gray-900 border-gray-700">
+                            <SelectItem value="none">None</SelectItem>
+                            <SelectItem value="noise">Noise</SelectItem>
+                            <SelectItem value="paper">Paper</SelectItem>
+                            <SelectItem value="fabric">Fabric</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      {state.style.background.texture && state.style.background.texture !== 'none' && (
+                        <div>
+                          <Label className="text-sm">Texture Intensity</Label>
+                          <Slider
+                            value={[state.style.background.textureIntensity || 0.5]}
+                            onValueChange={([value]) => setState(prev => ({
+                              ...prev,
+                              style: {
+                                ...prev.style,
+                                background: {
+                                  ...prev.style.background,
+                                  textureIntensity: value
+                                }
+                              }
+                            }))}
+                            min={0.1}
+                            max={1}
+                            step={0.1}
+                            className="mt-2"
+                          />
+                          <div className="text-xs text-gray-400 mt-1">{Math.round((state.style.background.textureIntensity || 0.5) * 100)}%</div>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
               )}

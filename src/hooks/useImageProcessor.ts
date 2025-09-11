@@ -17,10 +17,19 @@ interface StyleConfig {
   borderRadius: number;
   margin: number;
   background: {
-    type: 'solid' | 'gradient';
+    type: 'solid' | 'gradient' | 'pattern';
     color?: string;
     direction?: 'to-r' | 'to-l' | 'to-t' | 'to-b' | 'to-br' | 'to-bl' | 'to-tr' | 'to-tl';
     colors?: Array<{ color: string; position?: number }>;
+    // Pattern properties
+    pattern?: 'dots' | 'lines' | 'grid';
+    patternSize?: number;
+    patternColor?: string;
+    patternOpacity?: number;
+    patternBackgroundType?: 'solid' | 'gradient'; // Background base for patterns
+    // Texture properties
+    texture?: 'noise' | 'paper' | 'fabric' | 'none';
+    textureIntensity?: number;
   };
   browserMockup: 'safari' | 'chrome' | 'firefox' | 'edge' | 'none';
   shadow: {
@@ -123,14 +132,34 @@ export function useImageProcessor() {
     height: number,
     background: StyleConfig['background']
   ) => {
+    // Base background
     if (background.type === 'solid') {
       ctx.fillStyle = background.color || '#667eea';
       ctx.fillRect(0, 0, width, height);
-    } else {
+    } else if (background.type === 'gradient') {
       // Create gradient
       const gradient = createGradient(ctx, width, height, background.direction || 'to-br', background.colors || []);
       ctx.fillStyle = gradient;
       ctx.fillRect(0, 0, width, height);
+    } else if (background.type === 'pattern') {
+      // Base background for pattern (solid or gradient)
+      if (background.patternBackgroundType === 'gradient') {
+        const gradient = createGradient(ctx, width, height, background.direction || 'to-br', background.colors || []);
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, width, height);
+      } else {
+        // Default to solid color
+        ctx.fillStyle = background.color || '#667eea';
+        ctx.fillRect(0, 0, width, height);
+      }
+      
+      // Draw pattern overlay
+      drawPattern(ctx, width, height, background);
+    }
+
+    // Apply texture overlay (for any background type)
+    if (background.texture && background.texture !== 'none') {
+      drawTexture(ctx, width, height, background);
     }
   };
 
@@ -178,6 +207,173 @@ export function useImageProcessor() {
     });
 
     return gradient;
+  };
+
+  const drawPattern = (
+    ctx: CanvasRenderingContext2D,
+    width: number,
+    height: number,
+    background: StyleConfig['background']
+  ) => {
+    const patternSize = background.patternSize || 20;
+    const patternColor = background.patternColor || '#ffffff';
+    const patternOpacity = background.patternOpacity || 0.1;
+
+    ctx.save();
+    ctx.globalAlpha = patternOpacity;
+    ctx.fillStyle = patternColor;
+    ctx.strokeStyle = patternColor;
+
+    switch (background.pattern) {
+      case 'dots':
+        drawDots(ctx, width, height, patternSize);
+        break;
+      case 'lines':
+        drawLines(ctx, width, height, patternSize);
+        break;
+      case 'grid':
+        drawGrid(ctx, width, height, patternSize);
+        break;
+    }
+
+    ctx.restore();
+  };
+
+  const drawDots = (ctx: CanvasRenderingContext2D, width: number, height: number, size: number) => {
+    const spacing = size * 2;
+    const radius = size / 8;
+    
+    for (let x = spacing; x < width; x += spacing) {
+      for (let y = spacing; y < height; y += spacing) {
+        ctx.beginPath();
+        ctx.arc(x, y, radius, 0, 2 * Math.PI);
+        ctx.fill();
+      }
+    }
+  };
+
+  const drawLines = (ctx: CanvasRenderingContext2D, width: number, height: number, size: number) => {
+    const spacing = size;
+    ctx.lineWidth = size / 10;
+
+    // Vertical lines
+    for (let x = spacing; x < width; x += spacing) {
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x, height);
+      ctx.stroke();
+    }
+  };
+
+  const drawGrid = (ctx: CanvasRenderingContext2D, width: number, height: number, size: number) => {
+    const spacing = size;
+    ctx.lineWidth = size / 15;
+
+    // Vertical lines
+    for (let x = spacing; x < width; x += spacing) {
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x, height);
+      ctx.stroke();
+    }
+
+    // Horizontal lines
+    for (let y = spacing; y < height; y += spacing) {
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(width, y);
+      ctx.stroke();
+    }
+  };
+
+  const drawTexture = (
+    ctx: CanvasRenderingContext2D,
+    width: number,
+    height: number,
+    background: StyleConfig['background']
+  ) => {
+    const intensity = background.textureIntensity || 0.5;
+
+    ctx.save();
+    ctx.globalAlpha = intensity;
+
+    switch (background.texture) {
+      case 'noise':
+        drawNoise(ctx, width, height);
+        break;
+      case 'paper':
+        drawPaper(ctx, width, height);
+        break;
+      case 'fabric':
+        drawFabric(ctx, width, height);
+        break;
+    }
+
+    ctx.restore();
+  };
+
+  const drawNoise = (ctx: CanvasRenderingContext2D, width: number, height: number) => {
+    const imageData = ctx.createImageData(width, height);
+    const data = imageData.data;
+
+    for (let i = 0; i < data.length; i += 4) {
+      const noise = Math.random() * 255;
+      data[i] = noise;     // R
+      data[i + 1] = noise; // G
+      data[i + 2] = noise; // B
+      data[i + 3] = 50;    // A (low alpha for subtle effect)
+    }
+
+    ctx.putImageData(imageData, 0, 0);
+  };
+
+  const drawPaper = (ctx: CanvasRenderingContext2D, width: number, height: number) => {
+    // Paper texture with fibres and subtle variations
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+    
+    for (let i = 0; i < width * height / 100; i++) {
+      const x = Math.random() * width;
+      const y = Math.random() * height;
+      const size = Math.random() * 2 + 0.5;
+      
+      ctx.beginPath();
+      ctx.arc(x, y, size, 0, 2 * Math.PI);
+      ctx.fill();
+    }
+
+    // Add some random lines for paper fibres
+    ctx.strokeStyle = 'rgba(200, 200, 200, 0.1)';
+    ctx.lineWidth = 0.5;
+    
+    for (let i = 0; i < 20; i++) {
+      ctx.beginPath();
+      ctx.moveTo(Math.random() * width, Math.random() * height);
+      ctx.lineTo(Math.random() * width, Math.random() * height);
+      ctx.stroke();
+    }
+  };
+
+  const drawFabric = (ctx: CanvasRenderingContext2D, width: number, height: number) => {
+    // Fabric texture with cross-hatch pattern
+    const spacing = 3;
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+    ctx.lineWidth = 0.5;
+
+    // Horizontal threads
+    for (let y = 0; y < height; y += spacing) {
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(width, y);
+      ctx.stroke();
+    }
+
+    // Vertical threads
+    for (let x = 0; x < width; x += spacing * 2) {
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x, height);
+      ctx.stroke();
+    }
   };
 
   const drawRoundedImage = (

@@ -2,15 +2,15 @@ import sharp from 'sharp';
 import type { StyleConfig, BackgroundStyle, GradientDirection, FinalImageSize } from '../types.js';
 
 export class ImageProcessor {
-  private static readonly GRADIENT_ANGLES: Record<GradientDirection, number> = {
-    'to-r': 90,
-    'to-l': 270,
-    'to-t': 0,
-    'to-b': 180,
-    'to-br': 135,
-    'to-bl': 225,
-    'to-tr': 45,
-    'to-tl': 315,
+  private static readonly GRADIENT_COORDINATES: Record<GradientDirection, {x1: string, y1: string, x2: string, y2: string}> = {
+    'to-r': { x1: '0%', y1: '0%', x2: '100%', y2: '0%' },      // Left to Right
+    'to-l': { x1: '100%', y1: '0%', x2: '0%', y2: '0%' },      // Right to Left
+    'to-t': { x1: '0%', y1: '100%', x2: '0%', y2: '0%' },      // Bottom to Top
+    'to-b': { x1: '0%', y1: '0%', x2: '0%', y2: '100%' },      // Top to Bottom
+    'to-br': { x1: '0%', y1: '0%', x2: '100%', y2: '100%' },   // Top-Left to Bottom-Right
+    'to-bl': { x1: '100%', y1: '0%', x2: '0%', y2: '100%' },   // Top-Right to Bottom-Left
+    'to-tr': { x1: '0%', y1: '100%', x2: '100%', y2: '0%' },   // Bottom-Left to Top-Right
+    'to-tl': { x1: '100%', y1: '100%', x2: '0%', y2: '0%' },   // Bottom-Right to Top-Left
   };
 
   static async processScreenshot(imageBuffer: Buffer, style: StyleConfig): Promise<Buffer> {
@@ -120,7 +120,7 @@ export class ImageProcessor {
     height: number,
     gradient: Extract<BackgroundStyle, { type: 'gradient' }>
   ): Promise<Buffer> {
-    const angle = this.GRADIENT_ANGLES[gradient.direction];
+    const coordinates = this.GRADIENT_COORDINATES[gradient.direction];
     const stops = gradient.colors
       .map(({ color, position = 50 }) => `<stop offset="${position}%" stop-color="${color}"/>`)
       .join('');
@@ -128,7 +128,7 @@ export class ImageProcessor {
     const svg = `
       <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
         <defs>
-          <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="0%" gradientTransform="rotate(${angle} 0.5 0.5)">
+          <linearGradient id="grad" x1="${coordinates.x1}" y1="${coordinates.y1}" x2="${coordinates.x2}" y2="${coordinates.y2}">
             ${stops}
           </linearGradient>
         </defs>
