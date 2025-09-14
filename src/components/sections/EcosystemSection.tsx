@@ -35,18 +35,30 @@ const EcosystemSection = () => {
             
             {/* Snip */}
             <div className="group p-8 rounded-3xl bg-gradient-card border border-border shadow-card hover:shadow-soft transition-all duration-300">
-              <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-500 rounded-2xl flex items-center justify-center mb-6 mx-auto group-hover:scale-110 transition-transform duration-300">
-                <Link className="w-8 h-8 text-white" />
+              <div className="w-16 h-16 bg-black rounded-2xl flex items-center justify-center mb-6 mx-auto group-hover:scale-110 transition-transform duration-300">
+                <svg width="32" height="32" viewBox="0 0 192 300" className="text-white fill-current">
+                  <path d="m110 176l-68-44v-37l72-48 43 30 35-25-79-52-111 74v79l72 47zm-28-52l68 44v37l-72 48-43-30-35 25 79 52 111-74v-79l-72-47z"/>
+                </svg>
               </div>
               <h3 className="text-2xl font-bold text-brand-gray mb-3">Snip</h3>
               <p className="text-brand-light-gray mb-4">
                 Encurtador de links inteligente com analytics avançados
               </p>
-              <div className="text-sm text-emerald-600 font-medium">Em breve</div>
+              <div className="flex justify-center">
+                <a
+                  href="https://snip.mxrqz.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm text-brand-blue font-medium hover:text-brand-purple transition-colors duration-300 flex items-center gap-2"
+                >
+                  snip.mxrqz.com
+                  <ArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
+                </a>
+              </div>
             </div>
           </div>
           
-          <div className="bg-white rounded-3xl p-8 shadow-card">
+          {/* <div className="bg-white rounded-3xl p-8 shadow-card">
             <div className="flex flex-col md:flex-row items-center justify-between gap-6">
               <div className="text-left">
                 <h3 className="text-xl font-bold text-brand-gray mb-2">
@@ -62,7 +74,7 @@ const EcosystemSection = () => {
                 <ArrowRight className="w-4 h-4" />
               </Button>
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
     </section>

@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { Compare } from "../ui/compare";
 
 const ExamplesSection = () => {
   return (
@@ -13,17 +14,17 @@ const ExamplesSection = () => {
             De capturas simples para apresentações profissionais em um clique
           </p>
         </div>
-        
+
         <div className="max-w-6xl mx-auto">
-          <div className="relative bg-white rounded-3xl p-8 shadow-brand">
-            <Image 
-              src="/before-after.jpg"
-              alt="Before and after examples of Snap transformations" 
-              width={1200}
-              height={600}
-              className="w-full h-auto rounded-2xl"
+          <div className="relative bg-white rounded-3xl aspect-video shadow-brand">
+            <Compare
+              className="w-full relative h-full z-0"
+              firstImage="./before.png"
+              secondImage="./after.png"
+              firstImageClassName="object-cover object-center"
+              secondImageClassname="object-cover object-center"
             />
-            
+
             {/* Labels */}
             <div className="absolute top-12 left-12">
               <div className="bg-red-100 text-red-600 px-4 py-2 rounded-full text-sm font-medium">
@@ -37,7 +38,7 @@ const ExamplesSection = () => {
               </div>
             </div>
           </div>
-          
+
           {/* Stats */}
           <div className="grid grid-cols-3 gap-8 mt-16 text-center">
             <div>
@@ -48,7 +49,7 @@ const ExamplesSection = () => {
                 Mais atrativo
               </div>
             </div>
-            
+
             <div>
               <div className="text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent mb-2">
                 &lt; 5s
@@ -57,7 +58,7 @@ const ExamplesSection = () => {
                 Para processar
               </div>
             </div>
-            
+
             <div>
               <div className="text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent mb-2">
                 100%
